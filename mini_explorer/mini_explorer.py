@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 
-# Run command:
-# python3 -u mini_explorer.py [params] 2&>1 | tee out.log
-
 import argparse
-import json, os, sys
+import json
 import requests
 import time
 import logging
+import os
+from os import path
 from threading import Thread
 from collections import defaultdict
+
+base = path.dirname(path.realpath(__file__))
+data = path.abspath(path.join(base, 'data'))
 
 def latestBlock() -> dict:
     return {"id": "1", "jsonrpc": "2.0",
@@ -40,17 +42,17 @@ def request(endpoint, request, output = False) -> str:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--output_file', required = True, help = 'File name for data log')
     parser.add_argument('--endpoints', help = 'Endpoints to query from, sorted by shard & seperated by commas')
-    parser.add_argument('--endpoint-file', dest = 'endpoint_file', help = 'List of endpoints, sorted by shard & seperated by new lines')
-    parser.add_argument('--output-file', dest = 'output_file', default = 'output.txt', help = 'Path to output data')
-    parser.add_argument('--no-staking', action = 'store_true', dest = 'no_staking', help = 'Disable check for staking transactions')
-    parser.add_argument('--sleep', default = 8, type = int, help = 'Sleep timer')
+    parser.add_argument('--endpoint_file', help = 'List of endpoints, sorted by shard & seperated by new lines')
+    parser.add_argument('--no_staking', action = 'store_true', help = 'Disable check for staking transactions')
+    parser.add_argument('--sleep', default = 4, type = int, help = 'Sleep timer')
 
     args = parser.parse_args()
 
     if not args.endpoints and not args.endpoint_file:
         print('Either endpoint file or list of endpoints is required.')
-        sys.exit(-1)
+        exit(1)
 
     endpoint = []
     if args.endpoints:
@@ -61,12 +63,19 @@ if __name__ == '__main__':
                 endpoint = [x.strip() for x in f]
         except FileNotFoundError:
             print('Given file not found: %s' % args.endpoint_file)
-            sys.exit(-1)
+            exit(1)
+
+    if not path.exists(data):
+        try:
+            os.mkdir(data)
+        except:
+            print("Could not make data directory")
+            exit(1)
 
     # Set up logger
     logger = logging.getLogger("mini_explorer")
     logger.setLevel(logging.INFO)
-    file_handler = logging.FileHandler(args.output_file)
+    file_handler = logging.FileHandler(path.join(data, args.output_file))
     file_handler.setLevel(logging.INFO)
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
