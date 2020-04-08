@@ -1,1 +1,6 @@
-__pycache__/*
+
+# Python ignores
+__pycache__
+
+# Commit logger specific ignore
+commit_logger/data
