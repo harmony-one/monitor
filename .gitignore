@@ -1,6 +1,12 @@
-
 # Python ignores
 __pycache__
 
-# Commit logger specific ignore
+# Commit logger specific ignores
 commit_logger/data
+
+# Mini explorer specific ignores
+mini_explorer/data
+
+# Status page specific ignores
+status_page/watchdog_authentication.txt
+
