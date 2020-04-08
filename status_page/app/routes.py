@@ -3,7 +3,7 @@ import queue
 import requests
 from collections import namedtuple
 from flask import render_template
-from status import app
+from app import app
 from threading import Thread
 
 NetworkInfo = namedtuple('NetworkInfo', ['watchdog', 'explorer', 'staking', 'endpoint'])
@@ -18,6 +18,10 @@ endpoint_queue = queue.Queue(maxsize = 0)
 @app.route('/status')
 def status():
 
+    with open('watchdog_authentication.txt', 'r') as f:
+        username = f.readline().strip()
+        password = f.readline().strip()
+
     with open('networks.txt', 'r') as f:
         network_list = {x.strip().split(',')[0].strip(): NetworkInfo(*[y.strip() for y in x.strip().split(',')][1:]) for x in f if not x[0] == '#'}
 
@@ -27,7 +31,7 @@ def status():
         statuses[n]['block'] = {}
         statuses[n]['explorer-link'] = network_list[n].explorer
         statuses[n]['staking-link'] = network_list[n].staking
-        watchdog_threads.append(Thread(target = query_watchdog, args = (n, network_list[n].watchdog, watchdog_queue)))
+        watchdog_threads.append(Thread(target = query_watchdog, args = (n, network_list[n].watchdog, username, password, watchdog_queue)))
 
     for w in watchdog_threads:
         w.start()
@@ -69,9 +73,9 @@ def status():
 
     return render_template('status.html.j2', data = statuses)
 
-def query_watchdog(network_name, network_watchdog, q):
+def query_watchdog(network_name, network_watchdog, username, password, q):
     try:
-        r = requests.get(watchdog % network_watchdog, auth=('harmony', 'harmony.one'))
+        r = requests.get(watchdog % network_watchdog, auth=(username, password))
     except requests.exceptions.ConnectionError:
         return
 
