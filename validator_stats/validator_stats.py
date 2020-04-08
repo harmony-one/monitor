@@ -37,7 +37,7 @@ def read_csv(csv_file) -> (dict, list):
     d = defaultdict(list)
     v = []
     for line in csv.reader(s):
-        if line[0] in groups and re.match('one1', line[6]) != None:
+        if line[0] in groups and re.match('one1', line[6]) != None and re.search('/[0-9]+$', line[2]) == None:
             v_print("Adding: %s" % line[6])
             d[line[0]].append(line[6])
             v.append(line[6])
