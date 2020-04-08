@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--endpoints', help = 'Endpoints to query from, sorted by shard & seperated by commas')
-    parser.add_argument('--output_file', default = path.join(base, 'commit_%s.log' % formatted_time), help = 'File to output log to')
+    parser.add_argument('--output_file', default = 'commit_%s.log' % formatted_time, help = 'File to output log to')
     parser.add_argument('--sleep', default = 60, type = int, help = 'Sleep timer')
 
     args = parser.parse_args()
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     # Set up logger
     logger = logging.getLogger("commit_logger")
     logger.setLevel(logging.INFO)
-    file_handler = logging.FileHandler(args.output_file)
+    file_handler = logging.FileHandler("data/%s" % args.output_file)
     file_handler.setLevel(logging.INFO)
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)

@@ -1,25 +1,21 @@
 ### Commit Logger
 
 #### Requirements
-(Assuming Python3 already installed)
-`python3 -m pip install requests`
-`python3 -m pip install flask`
+`python3 -m pip install -r requirements.txt`
 
 #### Run commands
 Using a Tmux session, run the logger:
 ```
-pushd ./commit
-python3 commit_logger.py --endpoints https://api.s0.os.hmny.io,https://api.s1.os.hmny.io,https://api.s2.os.hmny.io,https://api.s3.os.hmny.io
-popd
+python3 commit_logger.py --endpoints [https://api.s0.b.hmny.io,...]
 ```
 Split into 2 panes & run the flask server:
 ```
-export FLASK_APP=logger
-python3 -m flask run -p 5010
+export FLASK_APP=commit_log
+python3 -m flask run -p [port]
 ```
 
 #### Output
 ```
-./commit/data/commit.json
-./commit/data/commit_*.log
+./data/commit.json
+./data/commit_*.log
 ```

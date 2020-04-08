@@ -1,9 +1,9 @@
 import json
 from os import path
-from commit import app
+from app import app
 
 base = path.dirname(path.realpath(__file__))
-data = path.abspath(path.join(base, 'data'))
+data = path.abspath(path.join(base, '..', 'data'))
 json_log = path.join(data, 'commit.json')
 
 @app.route('/commit_log')
