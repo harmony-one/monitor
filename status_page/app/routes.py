@@ -3,7 +3,7 @@ import queue
 import requests
 from collections import namedtuple
 from flask import render_template
-from status import app
+from app import app
 from threading import Thread
 
 NetworkInfo = namedtuple('NetworkInfo', ['watchdog', 'explorer', 'staking', 'endpoint'])
