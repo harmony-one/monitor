@@ -40,14 +40,17 @@ def read_csv(csv_file) -> (dict, list):
     v = []
     dup_list = []
     for line in csv.reader(s):
-        if line[0] in groups and re.match('one1', line[6]) != None:
-            if re.search('/[0-9]+$', line[2]) != None:
-                v_print("Dup: %s" % line[6])
-                dup_list.append(line[6])
+        group = line[0].strip()
+        email = line[2].strip()
+        address = line[6].strip()
+        if group in groups and re.match('one1', address) != None:
+            if re.search('/[0-9]+$',  email) != None or re.search('www.ankr.com', email) != None:
+                v_print("Skipping: %s" % address)
+                dup_list.append(address)
             else:
-                v_print("Adding: %s" % line[6])
-                d[line[0]].append(line[6])
-                v.append(line[6])
+                v_print("Adding: %s" % address)
+                d[group].append(address)
+                v.append(address)
     return d, v, dup_list
 
 def get_validator_information(endpoint, validators) -> dict:
