@@ -8,6 +8,8 @@ import argparse
 import requests
 import re
 from collections import defaultdict
+from queue import Queue
+from threading import Thread
 
 csv_link = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTUUOCAuSgP8TcA1xWY5AbxaMO7OSowYgdvaHpeMQudAZkHkJrf2sGE6TZ0hIbcy20qpZHmlC8HhCw1/pub?gid=0&single=true&output=csv'
 encoding = 'utf-8'
@@ -36,26 +38,48 @@ def read_csv(csv_file) -> (dict, list):
     s = [x.decode(encoding) for x in r.content.splitlines()]
     d = defaultdict(list)
     v = []
+    dup_list = []
     for line in csv.reader(s):
-        if line[0] in groups and re.match('one1', line[6]) != None and re.search('/[0-9]+$', line[2]) == None:
-            v_print("Adding: %s" % line[6])
-            d[line[0]].append(line[6])
-            v.append(line[6])
-    return d, v
+        if line[0] in groups and re.match('one1', line[6]) != None:
+            if re.search('/[0-9]+$', line[2]) != None:
+                v_print("Dup: %s" % line[6])
+                dup_list.append(line[6])
+            else:
+                v_print("Adding: %s" % line[6])
+                d[line[0]].append(line[6])
+                v.append(line[6])
+    return d, v, dup_list
 
 def get_validator_information(endpoint, validators) -> dict:
     v_print("-- hmy_getValidatorInformation --")
     validator_information = {}
-    for v in validators:
-        v_print("Address: %s" % v)
+    def collect_validator_information(validator, endpoint, q):
         payload = {"id": "1", "jsonrpc": "2.0",
                    "method": "hmy_getValidatorInformation",
-                   "params": [v]}
+                   "params": [validator]}
         r = requests.request('POST', endpoint, headers = headers, data = json.dumps(payload), timeout = 30)
         try:
-            validator_information[v] = json.loads(r.content)['result']
+            q.put((validator, json.loads(r.content)['result']))
         except:
-            validator_information[v] = None
+            q.put((validator, None))
+    threads = []
+    q = Queue(maxsize = 0)
+    for v in validators:
+        v_print("Address: %s" % v)
+        threads.append(Thread(target = collect_validator_information, args = (v, endpoint, q)))
+    batch = []
+    for t in threads:
+        batch.append(t)
+        t.start()
+        if len(batch) == 10:
+            for b in batch:
+                b.join()
+            batch = []
+    for b in batch:
+        b.join()
+    while not q.empty():
+        val, out = q.get()
+        validator_information[val] = out
     return validator_information
 
 if __name__ == '__main__':
@@ -75,9 +99,8 @@ if __name__ == '__main__':
 
     network_validators = get_all_validators(args.endpoint)
     committee = get_all_keys(args.endpoint)
-    by_group, csv_validators = read_csv(args.csv_link)
-    all_validators = list(set(network_validators + csv_validators))
-    new_validators = [x for x in network_validators if x not in csv_validators]
+    by_group, csv_validators, extra_validators = read_csv(args.csv_link)
+    new_validators = [x for x in network_validators if x not in csv_validators and x not in extra_validators]
     validator_information = get_validator_information(args.endpoint, network_validators)
 
     v_print("-- Processing data --")
@@ -107,7 +130,7 @@ if __name__ == '__main__':
     print("Total created validators: %d" % len(network_validators))
     print("Validators that have earned rewards: %d" % len(earned_validators))
     print("Current validators: %d" % len(current_validators))
-    print("Total bls keys in committee: %d" % len(external_bls_keys))
+    print("Current keys in committee: %d" % len(external_bls_keys))
 
     print()
 
