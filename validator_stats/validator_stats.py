@@ -113,7 +113,9 @@ if __name__ == '__main__':
             if not y['is-harmony-slot']:
                 external_bls_keys.append(y['bls-public-key'])
 
-    current_validators = [v for v in network_validators if validator_information[v]['currently-in-committee'] > 0]
+    elected_validators = [v for v in network_validators if validator_information[v]['currently-in-committee'] == True]
+    eligible_validators = [v for v in network_validators if validator_information[v]['epos-status'] == 'eligible to be elected next epoch']
+    not_eligible_validators = [v for v in network_validators if validator_information[v]['epos-status'] == 'not eligible to be elected next epoch']
     earned_validators = [v for v in network_validators if validator_information[v]['lifetime']['reward-accumulated'] > 0]
 
     per_group_earning_validators = defaultdict(list)
@@ -132,7 +134,9 @@ if __name__ == '__main__':
     print("-- Total Validator Stats --")
     print("Total created validators: %d" % len(network_validators))
     print("Validators that have earned rewards: %d" % len(earned_validators))
-    print("Current validators: %d" % len(current_validators))
+    print("Elected validators: %d" % len(elected_validators))
+    print("Eligible validators: %d" % len(eligible_validators))
+    print("Not eligible validators: %d" % len(not_eligible_validators))
     print("Current keys in committee: %d" % len(external_bls_keys))
 
     print()
