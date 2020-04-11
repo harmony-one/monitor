@@ -18,9 +18,7 @@ endpoint_queue = queue.Queue(maxsize = 0)
 @app.route('/status')
 def status():
 
-    with open('watchdog_authentication.txt', 'r') as f:
-        username = f.readline().strip()
-        password = f.readline().strip()
+    username, password = parse_auth()
 
     with open('networks.txt', 'r') as f:
         network_list = {x.strip().split(',')[0].strip(): NetworkInfo(*[y.strip() for y in x.strip().split(',')][1:]) for x in f if not x[0] == '#'}
@@ -92,3 +90,19 @@ def check_endpoint(endpoint, shard_id, network_name, q):
     except requests.exceptions.ConnectionError:
         avail = False
     q.put((network_name, shard_id, avail))
+
+def parse_auth():
+    with open('watchdog_authentication.txt', 'r') as f:
+        username = f.readline().strip()
+        password = f.readline().strip()
+    return username, password
+
+@app.route('/status-<network>')
+def json_output(network):
+    username, password = parse_auth()
+    try:
+        r = requests.get(watchdog % network, auth=(username, password))
+        out = r.json()
+    except:
+        return '{"error": "%s network not found"}' % network
+    return out
