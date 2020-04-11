@@ -162,8 +162,7 @@ if __name__ == '__main__':
                     commit_data[network][version][shard]['block-height'] = str(height)
             with open(json_log, 'w') as f:
                 json.dump(commit_data, f, sort_keys = True, indent = 4)
-            time.sleep(args.sleep)
-        except ValueError as e:
+        except Exception as e:
             logger.error("ERROR: %s" % e)
-            exit()
             pass
+        time.sleep(args.sleep)
