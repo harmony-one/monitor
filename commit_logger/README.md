@@ -49,31 +49,29 @@ Or using `curl`:
 ```json
 $ curl http://localhost:5000/commit_log | jq
 {
-  "ostn": {
-    "Harmony (C) 2020. harmony, version v5826-v1.9.1-12-g030eaaf4 (leochen@ 2020-04-09T23:48:17+0000)": {
-      "0": 9249,
-      "1": 9154,
-      "2": 9258,
-      "3": 9243,
-      "first-block-timestamp": "04/10_05:05:37",
-      "latest": "04/11_02:02:19"
+    "ostn": {
+        "Harmony (C) 2020. harmony, version v5826-v1.9.1-12-g030eaaf4 (leochen@ 2020-04-09T23:48:17+0000)": {
+            "0": {
+                "block-height": "9545",
+                "first-block-timestamp": "04/09_22:10:37",
+                "latest-timestamp": "04/10_20:08:48"
+            },
+            "1": {
+                "block-height": "9449",
+                "first-block-timestamp": "",
+                "latest-timestamp": "04/10_20:08:55"
+            },
+            "2": {
+                "block-height": "9550",
+                "first-block-timestamp": "04/09_22:10:42",
+                "latest-timestamp": "04/10_20:08:46"
+            },
+            "3": {
+                "block-height": "9538",
+                "first-block-timestamp": "04/09_23:11:21",
+                "latest-timestamp": "04/10_20:08:53"
+            }
+        }
     }
-  },
-  "ps": {
-    "Harmony (C) 2020. harmony, version v5726-v1.3.5-35-gfb4dabed (ec2-user@ 2020-03-25T08:53:25+0000)": {
-      "0": 180839,
-      "1": 180843,
-      "first-block-timestamp": "03/25_08:08:15",
-      "latest": "04/11_02:02:13"
-    }
-  },
-  "stn": {
-    "Harmony (C) 2020. harmony, version v5826-v1.3.5-135-g030eaaf4 (ec2-user@ 2020-04-08T19:40:01+0000)": {
-      "0": 5992,
-      "1": 6005,
-      "first-block-timestamp": "04/10_13:01:04",
-      "latest": "04/11_02:02:15"
-    }
-  }
 }
 ```
