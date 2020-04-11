@@ -6,6 +6,7 @@ import requests
 import time
 import logging
 import queue
+import re
 from datetime import datetime
 from collections import defaultdict
 from os import path
@@ -36,7 +37,6 @@ def firstBlock() -> dict:
             "params": ["0x1", True]}
 
 def request(endpoint, request, output = False) -> str:
-    # Send request
     try:
         r = requests.request('POST', endpoint, headers = headers, data = json.dumps(request), timeout = 5)
     except:
@@ -58,6 +58,7 @@ if __name__ == '__main__':
     if args.setup:
         if not path.exists(config_file):
             with open(config_file, 'w') as f:
+                f.write('# network name, rpc endpoint (ascending order by shard)\n')
                 f.write('mainnet, https://api.s0.t.hmny.io\n')
                 f.write('mainnet, https://api.s1.t.hmny.io\n')
                 f.write('mainnet, https://api.s2.t.hmny.io\n')
@@ -75,11 +76,13 @@ if __name__ == '__main__':
     networks = defaultdict(list)
     with open(config_file, 'r') as f:
         for l in f:
-            try:
-                net, endpoint = tuple(x.strip() for x in l.strip().split(','))
-            except:
-                print('[ERROR] Config file format does not match required format [network, endpoint]: %s' % l)
-            networks[net].append(endpoint)
+            if re.match('#', l) == None:
+                try:
+                    net, endpoint = [x.strip() for x in l.strip().split(',')]
+                except:
+                    print('[ERROR] Config file format does not match required format [network, endpoint]: %s' % l)
+                    exit()
+                networks[net].append(endpoint)
 
     if not path.exists(data):
         try:
@@ -98,7 +101,7 @@ if __name__ == '__main__':
     logger.addHandler(file_handler)
     logger.addHandler(console_handler)
 
-    commit_data = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
+    commit_data = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(str))))
 
     # If log already exists, read existing data
     if path.exists(json_log):
@@ -118,8 +121,9 @@ if __name__ == '__main__':
             height = int(block['blockNumber'])
             shard = str(block['shardID'])
             timestamp = int(block['unixtime'])
-            logger.info('Network: %s\tCommit: %s\tShard: %s\tBlock: %d\tTimestamp: %s' % (network, commit, shard, height, timestamp))
-            q.put((network, commit, shard, height, timestamp))
+            out = (network, commit, shard, height, timestamp)
+            logger.info('Network: %s\tCommit: %s\tShard: %s\tBlock: %d\tTimestamp: %s' % out)
+            q.put(out)
 
     backup_counter = 0
     while True:
@@ -142,16 +146,23 @@ if __name__ == '__main__':
                 t.join()
             while not q.empty():
                 network, version, shard, height, timestamp = q.get()
-                if not commit_data[network][version]:
-                    first = request(networks[network][0], firstBlock())
+                if not commit_data[network][version][shard]['first-block-timestamp']:
+                    first = request(networks[network][int(shard)], firstBlock())
                     if first != None:
-                        commit_data[network][version]['first-block-timestamp'] = datetime.fromtimestamp(int(first['timestamp'], 0)).strftime(read_time_fmt)
-                if height > commit_data[network][version][shard]:
-                    commit_data[network][version]['latest'] = datetime.fromtimestamp(timestamp).strftime(read_time_fmt)
-                    commit_data[network][version][shard] = height
+                        ts = datetime.fromtimestamp(int(first['timestamp'], 0)).strftime(read_time_fmt)
+                        commit_data[network][version][shard]['first-block-timestamp'] = ts
+                recorded_height = 0
+                try:
+                    recorded_height = int(commit_data[network][version][shard]['block-height'])
+                except ValueError:
+                    pass
+                if height > recorded_height:
+                    ts = datetime.fromtimestamp(timestamp).strftime(read_time_fmt)
+                    commit_data[network][version][shard]['latest-timestamp'] = ts
+                    commit_data[network][version][shard]['block-height'] = str(height)
             with open(json_log, 'w') as f:
                 json.dump(commit_data, f, sort_keys = True, indent = 4)
-            time.sleep(args.sleep)
         except Exception as e:
             logger.error("ERROR: %s" % e)
             pass
+        time.sleep(args.sleep)
