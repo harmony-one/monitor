@@ -3,6 +3,7 @@ __pycache__
 
 # Commit logger specific ignores
 commit_logger/data
+commit_logger/network_information.txt
 
 # Mini explorer specific ignores
 mini_explorer/data
