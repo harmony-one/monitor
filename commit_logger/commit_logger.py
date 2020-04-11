@@ -136,13 +136,13 @@ if __name__ == '__main__':
             for t in threads:
                 t.join()
             while not q.empty():
-                n, v, s, h, t = q.get()
-                if not commit_data[n][v]:
-                    commit_data[n][v]['first'] = t
-                    commit_data[n][v]['first-block'] = h
-                if h > commit_data[n][v][str(s)]:
-                    commit_data[n][v]['latest'] = t
-                    commit_data[n][v][str(s)] = h
+                network, version, shard, height, timestamp = q.get()
+                if not commit_data[network][version]:
+                    commit_data[network][version]['first'] = timestamp
+                    commit_data[network][version]['first-block'] = height
+                if height > commit_data[network][version][shard]:
+                    commit_data[network][version]['latest'] = timestamp
+                    commit_data[network][version][shard] = height
             with open(json_log, 'w') as f:
                 json.dump(commit_data, f, sort_keys = True, indent = 4)
             time.sleep(args.sleep)
