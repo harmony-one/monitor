@@ -30,6 +30,11 @@ def nodeMetadata() -> dict:
             "method": "hmy_getNodeMetadata",
             "params": []}
 
+def firstBlock() -> dict:
+    return {"id": "1", "jsonrpc": "2.0",
+            "method": "hmy_getBlockByNumber",
+            "params": ["0x1", True]}
+
 def request(endpoint, request, output = False) -> str:
     # Send request
     try:
@@ -112,7 +117,7 @@ if __name__ == '__main__':
             commit = metadata['version']
             height = int(block['blockNumber'])
             shard = str(block['shardID'])
-            timestamp = str(block['timestamp'])
+            timestamp = int(block['unixtime'])
             logger.info('Network: %s\tCommit: %s\tShard: %s\tBlock: %d\tTimestamp: %s' % (network, commit, shard, height, timestamp))
             q.put((network, commit, shard, height, timestamp))
 
@@ -138,10 +143,11 @@ if __name__ == '__main__':
             while not q.empty():
                 network, version, shard, height, timestamp = q.get()
                 if not commit_data[network][version]:
-                    commit_data[network][version]['first'] = timestamp
-                    commit_data[network][version]['first-block'] = height
+                    first = request(networks[network][0], firstBlock())
+                    if first != None:
+                        commit_data[network][version]['first-block-timestamp'] = datetime.fromtimestamp(int(first['timestamp'], 0)).strftime(read_time_fmt)
                 if height > commit_data[network][version][shard]:
-                    commit_data[network][version]['latest'] = timestamp
+                    commit_data[network][version]['latest'] = datetime.fromtimestamp(timestamp).strftime(read_time_fmt)
                     commit_data[network][version][shard] = height
             with open(json_log, 'w') as f:
                 json.dump(commit_data, f, sort_keys = True, indent = 4)
