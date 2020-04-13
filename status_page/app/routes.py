@@ -2,7 +2,10 @@ import json
 import queue
 import requests
 from collections import namedtuple
-from flask import render_template
+from flask import (
+    render_template,
+    request
+)
 from app import app
 from threading import Thread
 
@@ -19,6 +22,10 @@ endpoint_queue = queue.Queue(maxsize = 0)
 def status():
 
     username, password = parse_auth()
+
+    network = request.args.get('network', '')
+    if network != '':
+        return json_output(network, username, password)
 
     with open('networks.txt', 'r') as f:
         network_list = {x.strip().split(',')[0].strip(): NetworkInfo(*[y.strip() for y in x.strip().split(',')][1:]) for x in f if not x[0] == '#'}
@@ -97,9 +104,7 @@ def parse_auth():
         password = f.readline().strip()
     return username, password
 
-@app.route('/status-<network>')
-def json_output(network):
-    username, password = parse_auth()
+def json_output(network, username, password):
     try:
         r = requests.get(watchdog % network, auth=(username, password))
         out = r.json()
