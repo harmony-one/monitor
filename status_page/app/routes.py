@@ -3,8 +3,10 @@ import queue
 import requests
 from collections import namedtuple
 from flask import (
+    redirect,
     render_template,
-    request
+    request,
+    url_for
 )
 from app import app
 from threading import Thread
@@ -17,6 +19,10 @@ endpoint = 'https://api.s%s.%s.hmny.io'
 statuses = {}
 watchdog_queue = queue.Queue(maxsize = 0)
 endpoint_queue = queue.Queue(maxsize = 0)
+
+@app.route('/')
+def index():
+    return redirect(url_for('status'))
 
 @app.route('/status')
 def status():
