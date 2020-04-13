@@ -40,9 +40,9 @@ def read_csv(csv_file) -> (dict, list):
     v = []
     dup_list = []
     for line in csv.reader(s):
-        group = line[0].strip()
-        email = line[2].strip()
-        address = line[6].strip()
+        group = line[1].strip()
+        email = line[3].strip()
+        address = line[7].strip()
         if group in groups and re.match('one1', address) != None:
             if re.search('/[0-9]+$',  email) != None or re.search('www.ankr.com', email) != None:
                 v_print("Skipping: %s" % address)
