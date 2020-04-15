@@ -63,7 +63,7 @@ def status():
         if len(result['commit-version']) == 1:
             statuses[network_name]['commit-version'] = clean_version(result['commit-version'][0])
         else:
-            statuses[network_name]['commit-version'] = ", ".join([clean_version(x) for x in sorted(result['commit-version']))
+            statuses[network_name]['commit-version'] = ", ".join([clean_version(x) for x in sorted(result['commit-version'])])
         statuses[network_name]['used-seats'] = result['used-seats']
         statuses[network_name]['avail-seats'] = result['avail-seats']
         statuses[network_name]['validators'] = result['validators']
