@@ -1,6 +1,7 @@
 import json
 import queue
 import requests
+import re
 from collections import namedtuple
 from flask import (
     redirect,
@@ -60,9 +61,9 @@ def status():
             statuses[network_name]['block'][id]['endpoint'] = e
             endpoint_threads.append(Thread(target = check_endpoint, args = (e, id, network_name, endpoint_queue)))
         if len(result['commit-version']) == 1:
-            statuses[network_name]['commit-version'] = result['commit-version'][0]
+            statuses[network_name]['commit-version'] = clean_version(result['commit-version'][0])
         else:
-            statuses[network_name]['commit-version'] = ", ".join(sorted(result['commit-version']))
+            statuses[network_name]['commit-version'] = ", ".join([clean_version(x) for x in sorted(result['commit-version']))
         statuses[network_name]['used-seats'] = result['used-seats']
         statuses[network_name]['avail-seats'] = result['avail-seats']
         statuses[network_name]['validators'] = result['validators']
@@ -117,3 +118,6 @@ def json_output(network, username, password):
     except:
         return '{"error": "%s network not found"}' % network
     return out
+
+def clean_version(version_string):
+    return re.search('v[0-9]+-.*-g[a-z0-9]{8,}',version_string).group()
