@@ -22,6 +22,10 @@ from jinja2 import (
 base = path.dirname(path.realpath(__file__))
 data = path.abspath(path.join(base, 'data'))
 
+html_dis = path.join(data, 'earning.html')
+raw_data = path.join(data, 'validator_info.json')
+net_stat = path.join(data, 'network_stats.json'
+
 rpc_headers = {'Content-Type': 'application/json'}
 
 def rpc_request(method, endpoint, params):
@@ -75,6 +79,14 @@ if __name__ == '__main__':
     endpoint = f'https://api.s0.{args.network_endpoint}.hmny.io'
     network_validators = defaultdict(lambda : defaultdict(lambda: None))
     network_stats = defaultdict(int)
+
+    if path.exists(raw_data):
+        with open(raw_data, 'r') as f:
+            json_string = ''.join([x.strip() for x in f])
+        existing_data = json.loads(json_string)
+        for k in existing_data.keys():
+            for v in existing_data[k].keys():
+                network_validators[k][v] = existing_data[k][v]
 
     try:
         avail_seats = get_super_committees(endpoint)['current']['external-slot-count']
