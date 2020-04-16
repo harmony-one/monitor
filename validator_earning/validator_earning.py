@@ -35,7 +35,7 @@ def get_all_validators_information(endpoint, page = [-1]):
     return rpc_request('hmy_getAllValidatorInformation', endpoint, page)
 
 def get_super_committees(endpoint):
-    return rpc_request('hmy_getSuperCommittees', endpoint)
+    return rpc_request('hmy_getSuperCommittees', endpoint, [])
 
 def atto_to_one(atto):
     return float(atto) / 10e18
@@ -103,20 +103,23 @@ if __name__ == '__main__':
                         val['earned-rewards'] = deque(maxlen = 20)
                     val['earned-rewards'].append(current_earnings - val['lifetime-rewards'])
                     val['current-earnings'] = sum(val['earned-rewards'])
-                val['earning'] = val['current-earnings'] > float(0)
+                else:
+                    val['current-earnings'] = float(0)
+                if val['earned-rewards'] is not None:
+                    val['earning'] = val['current-earnings'] > float(0)
                 val['lifetime-rewards'] = current_earnings
                 if val['elected']:
                     elected.append(val)
                 else:
                     not_elected.append(val)
 
-            elected = sorted(elected, key = lambda x: x['current-earnings'], reverse = True))
-            not_elected = sorted(not_elected, key = lambda x: x['stake'], reverse = True))
+            elected = sorted(elected, key = lambda x: x['current-earnings'], reverse = True)
+            not_elected = sorted(not_elected, key = lambda x: x['stake'], reverse = True)
 
             network_stats['total-validators'] = len(network_validators.keys())
             network_stats['num-elected'] = len(elected)
-            network_stats['num-eligible'] = len([x for x in network_validators if x['epos-status'] == 'elected' or x['epos-status'] == 'eligible to be elected next epoch'])
-            network_stats['median-stake'] = median(sorted(network_validators, key = lambda x: x['stake'], reverse = True)[:avail_seats])
+            network_stats['num-eligible'] = len([x for x in network_validators.keys() if network_validators[x]['epos-status'] == 'eligible to be elected next epoch'])
+            network_stats['median-stake'] = median(sorted([network_validators[x]['stake'] for x in network_validators.keys()])[:avail_seats])
 
             v_print('-- Writing HTML --')
             with open(path.join(data, 'earning.html')) as f:
