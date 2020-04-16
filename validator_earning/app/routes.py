@@ -23,21 +23,24 @@ def validator_info():
             if address in data.keys():
                 return json.dumps(data[address])
             else:
-                return f'\{"error":"address {address} not found"\}'
+                return json.dumps({'error': f'address {address} not found'})
         else:
-            return '{"error":"missing data file"}'
+            return missing_data_error()
 
     stats = request.args.get('stats', '')
     if stats == 'true':
         if path.exists(net_stat):
             with open(net_stat, 'r') as f:
                 out = ''.join([x.strip() for x in f])
-            return out
+            return json.dumps(json.loads(out))
         else:
-            return '{"error":"missing data file"}'
+            return missing_data_error()
 
     if path.exists(html_dis):
         with open(html_dis, 'r') as f:
-            out = ''.join([x.strip() for x in f])
-        return out
-    return '{"error":"missing data file"}'
+            html = '\n'.join(f.readlines())
+        return html
+    return missing_data_error()
+
+def missing_data_error():
+    return json.dumps({'error': 'missing data file'})
