@@ -85,6 +85,7 @@ if __name__ == '__main__':
             elected = []
             not_elected = []
 
+            v_print('-- Processing Validator Information --')
             for info in validator_information:
                 validator_address = info['validator']['address']
                 val = network_validators[validator_address]
@@ -99,7 +100,7 @@ if __name__ == '__main__':
                         val['earned-rewards'] = deque(maxlen = 20)
                     val['earned-rewards'].append(current_earnings - val['lifetime-rewards'])
                     val['current-earnings'] = sum(val['earned-rewards'])
-                val['earning'] = val['earned-rewards'] > 0
+                val['earning'] = val['current-earnings'] > float(0)
                 val['lifetime-rewards'] = current_earnings
                 if val['elected']:
                     elected.append(val)
@@ -114,15 +115,18 @@ if __name__ == '__main__':
             network_stats['num-eligible'] = len([x for x in network_validators if x['epos-status'] == 'elected' or x['epos-status'] == 'eligible to be elected next epoch'])
             network_stats['median-stake'] = median(sorted(network_validators, key = lambda x: x['stake'], reverse = True)[:avail_seats])
 
+            v_print('-- Writing HTML --')
             with open(path.join(data, 'earning.html')) as f:
                 f.write(template.render(elected = elected, not_elected = not_elected, stats = network_stats))
 
+            v_print('-- Writing Validator Information --')
             with open(path.join(data, 'validator_info.json')) as f:
                 json.dump(network_validators, f, sort_keys = True, indent = 4)
 
+            v_print('-- Writing Network Stats --')
             with open(path.join(data, 'network_stats.json')) as f:
                 json.dump(network_stats, f, sort_keys = True, indent = 4)
 
             sleep_thread.join()
-        except Exception as e:
-            print(f'ERROR: {e}')
+        except FileNotFoundError:
+            pass
