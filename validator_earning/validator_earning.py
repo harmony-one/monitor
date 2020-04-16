@@ -86,12 +86,6 @@ if __name__ == '__main__':
             for v in existing_data[k].keys():
                 network_validators[k][v] = existing_data[k][v]
 
-    try:
-        avail_seats = get_super_committees(endpoint)['current']['external-slot-count']
-    except KeyError:
-        print('[ERROR] Can not get SuperCommittees')
-        exit()
-
     while True:
         try:
             sleep_thread = Thread(target = sleep_timer)
@@ -134,7 +128,6 @@ if __name__ == '__main__':
             network_stats['total-validators'] = len(network_validators.keys())
             network_stats['num-elected'] = len(elected)
             network_stats['num-eligible'] = len([x for x in network_validators.keys() if network_validators[x]['epos-status'] == 'eligible to be elected next epoch'])
-            network_stats['median-stake'] = median(sorted([network_validators[x]['stake'] for x in network_validators.keys()])[:avail_seats])
 
             v_print('-- Writing HTML --')
             with open(path.join(data, 'earning.html'), 'w') as f:
