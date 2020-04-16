@@ -69,9 +69,9 @@
                     {% for v in elected %}
                     <tr>
                       <td>{{ v['address'] }}</td>
-                      <td>{{ '%.4f'|format(v['stake']) }}</td>
-                      <td>{{ '%.4f'|format(v['lifetime-rewards']) }}</td>
-                      <td>{{ '%.4f'|format(v['current-earnings']) }}</td>
+                      <td align="right">{{ '%.4f'|format(v['stake']) }}</td>
+                      <td align="right">{{ '%.4f'|format(v['lifetime-rewards']) }}</td>
+                      <td align="right">{{ '%.4f'|format(v['current-earnings']) }}</td>
                     </tr>
                     {% endfor %}
                   </table>
@@ -94,9 +94,9 @@
                     <tr>
                       <td>{{ v['address'] }}</td>
                       <td>{{ v['epos-status'] }}</td>
-                      <td>{{ '%.4f'|format(v['stake']) }}</td>
+                      <td align="right">{{ '%.4f'|format(v['stake']) }}</td>
                       <td>{{ v['num-keys'] }}</td>
-                      <td>{{ '%.4f'|format(v['lifetime-rewards']) }}</td>
+                      <td align="right">{{ '%.4f'|format(v['lifetime-rewards']) }}</td>
                     </tr>
                     {% endfor %}
                   </table>
