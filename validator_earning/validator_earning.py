@@ -2,13 +2,13 @@
 
 import argparse
 import json
-import time
 import requests
 from collections import (
     defaultdict,
     deque
 )
 from os import path
+from time import sleep
 from statistics import median
 from threading import Thread
 from jinja2 import (
@@ -63,6 +63,9 @@ if __name__ == '__main__':
         except:
             print(f'[WARNING] Data directory already exists: {data}')
 
+    def sleep_timer():
+        sleep(args.timer)
+
     env = Environment(loader = FileSystemLoader(path.join(base, 'app', 'templates')), auto_reload = False)
     template = env.get_template('earning.html.j2')
 
@@ -78,7 +81,7 @@ if __name__ == '__main__':
 
     while True:
         try:
-            sleep_thread = Thread(target = time.sleep, args = (args.timer))
+            sleep_thread = Thread(target = sleep_timer)
             sleep_thread.start()
             validator_information = get_all_validators_information(endpoint)
 
