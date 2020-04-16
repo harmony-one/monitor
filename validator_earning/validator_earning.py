@@ -7,6 +7,7 @@ from collections import (
     defaultdict,
     deque
 )
+from decimal import Decimal
 from os import (
     mkdir,
     path
@@ -24,7 +25,7 @@ data = path.abspath(path.join(base, 'data'))
 
 html_dis = path.join(data, 'earning.html')
 raw_data = path.join(data, 'validator_info.json')
-net_stat = path.join(data, 'network_stats.json'
+net_stat = path.join(data, 'network_stats.json')
 
 rpc_headers = {'Content-Type': 'application/json'}
 
@@ -45,7 +46,7 @@ def get_super_committees(endpoint):
     return rpc_request('hmy_getSuperCommittees', endpoint, [])
 
 def atto_to_one(atto):
-    return float(atto) / 10e18
+    return Decimal(atto) / Decimal(10e18)
 
 if __name__ == '__main__':
     valid_networks = ['os', 'ps', 'stn']
@@ -116,7 +117,7 @@ if __name__ == '__main__':
                 if val['lifetime-rewards'] is not None:
                     if val['earned-rewards'] is None:
                         val['earned-rewards'] = deque(maxlen = 20)
-                    val['earned-rewards'].append(current_earnings - val['lifetime-rewards'])
+                    val['earned-rewards'].append(current_earnings - Decimal(val['lifetime-rewards']))
                     val['current-earnings'] = sum(val['earned-rewards'])
                 else:
                     val['current-earnings'] = float(0)

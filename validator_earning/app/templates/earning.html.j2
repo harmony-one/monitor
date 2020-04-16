@@ -69,7 +69,7 @@
                     {% for v in elected %}
                     <tr>
                       <td>{{ v['address'] }}</td>
-                      <td>{{ v['stake'] }}</td>
+                      <td>{{ '%.4f'|format(v['stake']) }}</td>
                       <td>{{ '%.4f'|format(v['lifetime-rewards']) }}</td>
                       <td>{{ '%.4f'|format(v['current-earnings']) }}</td>
                     </tr>
@@ -91,11 +91,13 @@
                       <th>Lifetime Rewards</th>
                     </tr>
                     {% for v in not_elected %}
+                    <tr>
                       <td>{{ v['address'] }}</td>
                       <td>{{ v['epos-status'] }}</td>
                       <td>{{ '%.4f'|format(v['stake']) }}</td>
                       <td>{{ v['num-keys'] }}</td>
                       <td>{{ '%.4f'|format(v['lifetime-rewards']) }}</td>
+                    </tr>
                     {% endfor %}
                   </table>
                 </div>
