@@ -57,7 +57,7 @@
             <div class="card flex-col">
             <span style="width: 95%;margin-right: 0;">
               <details open>
-                <summary>Elected ({{ stats['num-elected'] }}){{ stats['median-stake'] }}</summary>
+                <summary>Elected ({{ stats['num-elected'] }})</summary>
                 <div class="flex-col">
                   <table style = "width: 95%;">
                     <tr>
@@ -66,6 +66,7 @@
                       <th align="right">Bls Keys</th>
                       <th align="right">Lifetime Rewards</th>
                       <th align="right">Rewards (5min)</th>
+                      <th align="right">Uptime</th>
                     </tr>
                     {% for v in elected %}
                     <tr>
@@ -74,6 +75,7 @@
                       <td align="right">{{ v['num-keys'] }}</td>
                       <td align="right">{{ '%.4f'|format(v['lifetime-rewards']) }}</td>
                       <td align="right">{{ '%.4f'|format(v['current-earnings']) }}</td>
+                      <td align="right">{{ v['availibility'] }}</td>
                     </tr>
                     {% endfor %}
                   </table>

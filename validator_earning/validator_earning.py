@@ -118,6 +118,8 @@ if __name__ == '__main__':
                     val['earning'] = val['current-earnings'] > float(0)
                 val['lifetime-rewards'] = float(current_earnings)
                 if val['elected']:
+                    avail = int(float(info['current-epoch-performance']['current-epoch-signing-percent']['current-epoch-signing-percentage']) * 100)
+                    val['availibility'] = f'{avail}%'
                     elected.append(val)
                 else:
                     not_elected.append(val)
