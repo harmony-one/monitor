@@ -16,7 +16,7 @@ def validator_info():
     address = request.args.get('address', '')
     if address != '':
         if path.exists(raw_data):
-            with open(raw_data, 'r') as f:
+            with open(raw_data, 'r', encoding = 'utf-8') as f:
                 out = ''.join([x.strip() for x in f])
             data = json.loads(out)
             if address in data.keys():
@@ -29,14 +29,14 @@ def validator_info():
     stats = request.args.get('stats', '')
     if stats == 'true':
         if path.exists(net_stat):
-            with open(net_stat, 'r') as f:
+            with open(net_stat, 'r', encoding = 'utf-8') as f:
                 out = ''.join([x.strip() for x in f])
             return json.dumps(json.loads(out))
         else:
             return missing_data_error()
 
     if path.exists(html_dis):
-        with open(html_dis, 'r') as f:
+        with open(html_dis, 'r' , encoding = 'utf-8') as f:
             html = '\n'.join(f.readlines())
         return html
     return missing_data_error()

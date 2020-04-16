@@ -79,7 +79,7 @@ if __name__ == '__main__':
     network_stats = defaultdict(int)
 
     if path.exists(raw_data):
-        with open(raw_data, 'r') as f:
+        with open(raw_data, 'r', encoding = 'utf-8') as f:
             json_string = ''.join([x.strip() for x in f])
         existing_data = json.loads(json_string)
         for k in existing_data.keys():
@@ -132,15 +132,15 @@ if __name__ == '__main__':
             network_stats['num-eligible'] = len([x for x in network_validators.keys() if network_validators[x]['epos-status'] == 'eligible to be elected next epoch'])
 
             v_print('-- Writing HTML --')
-            with open(path.join(data, 'earning.html'), 'w') as f:
+            with open(path.join(data, 'earning.html'), 'w', encoding = 'utf-8') as f:
                 f.write(template.render(elected = elected, not_elected = not_elected, stats = network_stats))
 
             v_print('-- Writing Validator Information --')
-            with open(path.join(data, 'validator_info.json'), 'w') as f:
+            with open(path.join(data, 'validator_info.json'), 'w', encoding = 'utf-8') as f:
                 json.dump(network_validators, f, sort_keys = True, indent = 4)
 
             v_print('-- Writing Network Stats --')
-            with open(path.join(data, 'network_stats.json'), 'w') as f:
+            with open(path.join(data, 'network_stats.json'), 'w', encoding = 'utf-8') as f:
                 json.dump(network_stats, f, sort_keys = True, indent = 4)
 
             sleep_thread.join()
