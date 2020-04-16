@@ -3,10 +3,7 @@
 import argparse
 import json
 import requests
-from collections import (
-    defaultdict,
-    deque
-)
+from collections import defaultdict
 from decimal import Decimal
 from os import (
     mkdir,
@@ -116,7 +113,9 @@ if __name__ == '__main__':
                 current_earnings = atto_to_one(info['lifetime']['reward-accumulated'])
                 if val['lifetime-rewards'] is not None:
                     if val['earned-rewards'] is None:
-                        val['earned-rewards'] = deque(maxlen = 20)
+                        val['earned-rewards'] = []
+                    if len(val['earned-rewards']) == 20:
+                        val['earned-rewards'] = val['earned-rewards'][1:]
                     val['earned-rewards'].append(float(current_earnings - Decimal(val['lifetime-rewards'])))
                     val['current-earnings'] = sum(val['earned-rewards'])
                 else:
