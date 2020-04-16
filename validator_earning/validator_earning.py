@@ -112,18 +112,18 @@ if __name__ == '__main__':
                 val['elected'] = info['currently-in-committee']
                 val['epos-status'] = info['epos-status']
                 val['num-keys'] = len(info['validator']['bls-public-keys'])
-                val['stake'] = atto_to_one(info['total-delegation'])
+                val['stake'] = float(atto_to_one(info['total-delegation']))
                 current_earnings = atto_to_one(info['lifetime']['reward-accumulated'])
                 if val['lifetime-rewards'] is not None:
                     if val['earned-rewards'] is None:
                         val['earned-rewards'] = deque(maxlen = 20)
-                    val['earned-rewards'].append(current_earnings - Decimal(val['lifetime-rewards']))
+                    val['earned-rewards'].append(float(current_earnings - Decimal(val['lifetime-rewards'])))
                     val['current-earnings'] = sum(val['earned-rewards'])
                 else:
                     val['current-earnings'] = float(0)
                 if val['earned-rewards'] is not None:
                     val['earning'] = val['current-earnings'] > float(0)
-                val['lifetime-rewards'] = current_earnings
+                val['lifetime-rewards'] = float(current_earnings)
                 if val['elected']:
                     elected.append(val)
                 else:
