@@ -27,8 +27,8 @@ def validator_info():
         else:
             return '{"error":"missing data file"}'
 
-    stats = request.args.get('stats', False)
-    if stats == True:
+    stats = request.args.get('stats', '')
+    if stats == 'true':
         if path.exists(net_stat):
             with open(net_stat, 'r') as f:
                 out = ''.join([x.strip() for x in f])

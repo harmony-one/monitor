@@ -86,16 +86,16 @@
                     <tr>
                       <th>Address</th>
                       <th>Status</th>
-                      <th>Total Stake</th>
-                      <th>BLS Keys</th>
-                      <th>Lifetime Rewards</th>
+                      <th align="right">Total Stake</th>
+                      <th align="right">BLS Keys</th>
+                      <th align="right">Lifetime Rewards</th>
                     </tr>
                     {% for v in not_elected %}
                     <tr>
                       <td>{{ v['address'] }}</td>
                       <td>{{ v['epos-status'] }}</td>
                       <td align="right">{{ '%.4f'|format(v['stake']) }}</td>
-                      <td>{{ v['num-keys'] }}</td>
+                      <td aligh="right">{{ v['num-keys'] }}</td>
                       <td align="right">{{ '%.4f'|format(v['lifetime-rewards']) }}</td>
                     </tr>
                     {% endfor %}
