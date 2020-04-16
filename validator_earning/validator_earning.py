@@ -144,5 +144,5 @@ if __name__ == '__main__':
                 json.dump(network_stats, f, sort_keys = True, indent = 4)
 
             sleep_thread.join()
-        except EOFError:
-            pass
+        except Exception as e:
+            print(f'[ERROR]: {e}')
