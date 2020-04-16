@@ -7,7 +7,10 @@ from collections import (
     defaultdict,
     deque
 )
-from os import path
+from os import (
+    mkdir,
+    path
+)
 from time import sleep
 from statistics import median
 from threading import Thread
@@ -59,7 +62,7 @@ if __name__ == '__main__':
 
     if not path.exists(data):
         try:
-            os.mkdir(data)
+            mkdir(data)
         except:
             print(f'[WARNING] Data directory already exists: {data}')
 
@@ -122,17 +125,17 @@ if __name__ == '__main__':
             network_stats['median-stake'] = median(sorted([network_validators[x]['stake'] for x in network_validators.keys()])[:avail_seats])
 
             v_print('-- Writing HTML --')
-            with open(path.join(data, 'earning.html')) as f:
+            with open(path.join(data, 'earning.html'), 'w') as f:
                 f.write(template.render(elected = elected, not_elected = not_elected, stats = network_stats))
 
             v_print('-- Writing Validator Information --')
-            with open(path.join(data, 'validator_info.json')) as f:
+            with open(path.join(data, 'validator_info.json'), 'w') as f:
                 json.dump(network_validators, f, sort_keys = True, indent = 4)
 
             v_print('-- Writing Network Stats --')
-            with open(path.join(data, 'network_stats.json')) as f:
+            with open(path.join(data, 'network_stats.json'), 'w') as f:
                 json.dump(network_stats, f, sort_keys = True, indent = 4)
 
             sleep_thread.join()
-        except FileNotFoundError:
+        except EOFError:
             pass
