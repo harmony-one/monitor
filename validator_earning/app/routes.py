@@ -18,7 +18,6 @@ def validator_info():
         if path.exists(raw_data):
             with open(raw_data, 'r') as f:
                 out = ''.join([x.strip() for x in f])
-
             data = json.loads(out)
             if address in data.keys():
                 return json.dumps(data[address])
