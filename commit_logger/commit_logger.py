@@ -57,7 +57,7 @@ if __name__ == '__main__':
 
     if args.setup:
         if not path.exists(config_file):
-            with open(config_file, 'w') as f:
+            with open(config_file, 'w', encoding = 'utf-8') as f:
                 f.write('# network name, rpc endpoint (ascending order by shard)\n')
                 f.write('mainnet, https://api.s0.t.hmny.io\n')
                 f.write('mainnet, https://api.s1.t.hmny.io\n')
@@ -74,7 +74,7 @@ if __name__ == '__main__':
         exit()
 
     networks = defaultdict(list)
-    with open(config_file, 'r') as f:
+    with open(config_file, 'r', encoding = 'utf-8') as f:
         for l in f:
             if re.match('#', l) == None:
                 try:
@@ -105,7 +105,7 @@ if __name__ == '__main__':
 
     # If log already exists, read existing data
     if path.exists(json_log):
-        with open(json_log, 'r') as f:
+        with open(json_log, 'r', encoding = 'utf-8') as f:
             json_string = ''.join([x.strip() for x in f])
         existing_data = json.loads(json_string)
         for key in existing_data.keys():
@@ -130,7 +130,7 @@ if __name__ == '__main__':
         try:
             if backup_counter > 10:
                 logger.info("Creating backup log")
-                with open(backup_log, 'w') as f:
+                with open(backup_log, 'w', encoding = 'utf-8') as f:
                     json.dump(commit_data, f, sort_keys = True, indent = 4)
                 backup_counter = 0
             else:
@@ -160,7 +160,7 @@ if __name__ == '__main__':
                     ts = datetime.fromtimestamp(timestamp).strftime(read_time_fmt)
                     commit_data[network][version][shard]['latest-timestamp'] = ts
                     commit_data[network][version][shard]['block-height'] = str(height)
-            with open(json_log, 'w') as f:
+            with open(json_log, 'w', encoding = 'utf-8') as f:
                 json.dump(commit_data, f, sort_keys = True, indent = 4)
         except Exception as e:
             logger.error("ERROR: %s" % e)
