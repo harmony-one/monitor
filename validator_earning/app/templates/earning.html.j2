@@ -70,7 +70,9 @@
                     </tr>
                     {% for v in elected %}
                     <tr>
-                      <td>{{ v['address'] }}</td>
+                      <td style="font-family:'Courier New', monospaced; font-weight: 550;">
+                        {{ v['address'] }}
+                      </td>
                       <td align="right">{{ '%.4f'|format(v['stake']) }}</td>
                       <td align="right">{{ v['num-keys'] }}</td>
                       <td align="right">{{ '%.4f'|format(v['lifetime-rewards']) }}</td>
@@ -96,10 +98,12 @@
                     </tr>
                     {% for v in not_elected %}
                     <tr>
-                      <td>{{ v['address'] }}</td>
+                      <td style="font-family:'Courier New', monospaced; font-weight: 550;">
+                        {{ v['address'] }}
+                      </td>
                       <td>{{ v['epos-status'] }}</td>
                       <td align="right">{{ '%.4f'|format(v['stake']) }}</td>
-                      <td aligh="right">{{ v['num-keys'] }}</td>
+                      <td align="right">{{ v['num-keys'] }}</td>
                       <td align="right">{{ '%.4f'|format(v['lifetime-rewards']) }}</td>
                     </tr>
                     {% endfor %}
