@@ -59,7 +59,7 @@ if __name__ == '__main__':
         endpoint = [x.strip() for x in args.endpoints.strip().split(',')]
     else:
         try:
-            with open(args.endpoint_file, 'r') as f:
+            with open(args.endpoint_file, 'r', encoding = 'utf-8') as f:
                 endpoint = [x.strip() for x in f]
         except FileNotFoundError:
             print('Given file not found: %s' % args.endpoint_file)

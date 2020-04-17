@@ -9,7 +9,7 @@ json_log = path.join(data, 'commit.json')
 @app.route('/commit_log')
 def commit_log():
     if path.exists(json_log):
-        with open(json_log, 'r') as f:
+        with open(json_log, 'r', encoding = 'utf-8') as f:
             out = ''.join([x.strip() for x in f])
         return out
     return '{"error":"missing data file"}'

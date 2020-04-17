@@ -34,7 +34,7 @@ def status():
     if network != '':
         return json_output(network, username, password)
 
-    with open('networks.txt', 'r') as f:
+    with open('networks.txt', 'r', encoding = 'utf-8') as f:
         network_list = {x.strip().split(',')[0].strip(): NetworkInfo(*[y.strip() for y in x.strip().split(',')][1:]) for x in f if not x[0] == '#'}
 
     watchdog_threads = []
@@ -106,7 +106,7 @@ def check_endpoint(endpoint, shard_id, network_name, q):
     q.put((network_name, shard_id, avail))
 
 def parse_auth():
-    with open('watchdog_authentication.txt', 'r') as f:
+    with open('watchdog_authentication.txt', 'r', encoding = 'utf-8') as f:
         username = f.readline().strip()
         password = f.readline().strip()
     return username, password
