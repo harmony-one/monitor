@@ -130,6 +130,7 @@ if __name__ == '__main__':
             network_stats['total-validators'] = len(network_validators.keys())
             network_stats['num-elected'] = len(elected)
             network_stats['num-eligible'] = len([x for x in network_validators.keys() if network_validators[x]['epos-status'] == 'eligible to be elected next epoch'])
+            network_stats['num-ineligible'] = len([x for x in network_validators.keys() if network_validators[x]['epos-status'] == 'not eligible to be elected next epoch'])
 
             v_print('-- Writing HTML --')
             with open(path.join(data, 'earning.html'), 'w', encoding = 'utf-8') as f:
