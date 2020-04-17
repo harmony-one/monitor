@@ -108,7 +108,7 @@ if __name__ == '__main__':
                 if val['lifetime-rewards'] is not None:
                     if val['earned-rewards'] is None:
                         val['earned-rewards'] = []
-                    if len(val['earned-rewards']) == 20:
+                    if len(val['earned-rewards']) == 60:
                         val['earned-rewards'] = val['earned-rewards'][1:]
                     val['earned-rewards'].append(float(current_earnings - Decimal(val['lifetime-rewards'])))
                     val['current-earnings'] = sum(val['earned-rewards'])
