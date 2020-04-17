@@ -31,3 +31,6 @@ HTML page: http://localhost:5000/validators
 Query JSON for specific address: http://localhost:5000/valiators?address=[ONE_ADDRESS]
 Query JSON for network stats: https://localhost:5000/validators?stats=true
 ** Replace 5000 above with the port if specified a different port
+
+#### TODO
+Use jsonrpcserver to enable RPC "POST" requests
