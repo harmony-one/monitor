@@ -43,7 +43,7 @@ def get_super_committees(endpoint):
     return rpc_request('hmy_getSuperCommittees', endpoint, [])
 
 def atto_to_one(atto):
-    return Decimal(atto) / Decimal(10e18)
+    return Decimal(atto) / Decimal(1e18)
 
 if __name__ == '__main__':
     valid_networks = ['os', 'ps', 'stn']
