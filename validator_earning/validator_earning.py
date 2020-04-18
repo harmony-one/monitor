@@ -12,6 +12,8 @@ from os import (
 from time import sleep
 from statistics import median
 from threading import Thread
+
+from AutoNode import common
 from jinja2 import (
     Environment,
     FileSystemLoader
@@ -25,6 +27,9 @@ raw_data = path.join(data, 'validator_info.json')
 net_stat = path.join(data, 'network_stats.json')
 
 rpc_headers = {'Content-Type': 'application/json'}
+
+security_contact = common._validator_config_default['security-contact']
+identity = common._validator_config_default['identity']
 
 def rpc_request(method, endpoint, params):
     v_print(f'-- RPC Request: {method}, {params}')
@@ -119,7 +124,7 @@ if __name__ == '__main__':
                 val['lifetime-rewards'] = float(current_earnings)
                 if info['validator']['security-contact'] == 'info@ankr.com':
                     val['tag'] = 'ankr'
-                elif info['validator']['security-contact'] == 'Daniel-VDM'or info['validator']['identity'] == 'auto_node':
+                elif info['validator']['security-contact'] == security_contact or info['validator']['identity'] == identity:
                     val['tag'] = 'Autonode'
                 else:
                     val['tag'] = ''
