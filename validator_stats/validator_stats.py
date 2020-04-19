@@ -13,7 +13,7 @@ from threading import Thread
 
 csv_link = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTUUOCAuSgP8TcA1xWY5AbxaMO7OSowYgdvaHpeMQudAZkHkJrf2sGE6TZ0hIbcy20qpZHmlC8HhCw1/pub?gid=0&single=true&output=csv'
 encoding = 'utf-8'
-groups = ['team', 'p-ops', 'foundational nodes', 'p-volunteer', 'hackers', 'community', 'partners']
+groups = ['team', 'p-ops', 'foundational nodes', 'p-volunteer', 'hackers', 'community', 'partners', 'ankr']
 headers = {'Content-Type': 'application/json'}
 
 def get_all_validators(endpoint) -> list:
