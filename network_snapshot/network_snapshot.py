@@ -161,11 +161,11 @@ def get_validator_information_by_block(validator_addr, block_num, endpoint, retr
         r = requests.request('POST', endpoint, headers = headers, data = json.dumps(payload), timeout = 300)
         try:
             out = json.loads(r.content)['result']
-            return out
+            return validator_addr, out
         except Exception:
             pass
         retries = retries - 1
-    return None
+    return validator_addr, None
 
 def convert_atto_to_one(atto):
     return Decimal(atto) / Decimal(1e18)
@@ -283,11 +283,12 @@ def create_account_snapshot(account_list, block_num, epoch, endpoint, output_fil
             formatted_result = [k, v['balance'], v['total-delegations'], v['total-undelegations'], v['total-rewards'], v['total-balance']]
             writer.writerow(formatted_result)
 
-def get_validator_snapshot(block_num, endpoint, retries):
+def create_validator_snapshot(block_num, endpoint, output_file, retries):
     v_print(f'[get_validator_snapshot] Block Num: {block_num}')
     logger = logging.getLogger('validator')
     logger.setLevel(logging.DEBUG)
 
+    all_validator_information = defaultdict(dict)
     all_validators = get_all_validators_addresses(endpoint, retries)
     if all_validators is not None:
 
@@ -297,13 +298,27 @@ def get_validator_snapshot(block_num, endpoint, retries):
             threads.append(pool.apply_async(get_validator_information_by_block, (v, block_num, endpoint, retries)))
 
         for t in threads:
-            info = t.get()
+            addr, info = t.get()
             # Don't print if address not found
             if info is not None:
-                logger.debug(json.dumps(info, sort_keys = True, indent = 4))
+                try:
+                    all_validator_information[addr]['lifetime-reward'] = info['lifetime']['reward-accumulated']
+                    info['blockNumber'] = block_num
+                    logger.debug(json.dumps(info, sort_keys = True, indent = 4))
+                except Exception:
+                    err = {'error': f'error parsing validator information for {addr} for block #{block_num}'}
+                    logger.debug(json.dumps(err, sort_keys = True, indent = 4))
     else:
         err = {'error': f'unable to fetch list of all validators after for block #{block_num} after {retries} tries'}
         logger.debug(json.dumps(err, sort_keys = True, indent = 4))
+
+    with open(output_file, 'w', encoding = 'utf8') as f:
+        field_names = ['Address', 'Lifetime Rewards']
+        writer = csv.writer(f)
+        writer.writerow(field_names)
+        for k, v in account_data.items():
+            formatted_result = [k, v['lifetime-reward']]
+            writer.writerow(formatted_result)
 
 def get_epoch_last_block(epoch, blocks_per_epoch):
     return ((epoch + 1) * blocks_per_epoch) - 1
@@ -417,17 +432,26 @@ if __name__ == '__main__':
 
                 v_print(f'[main] Last block of epoch {prev_epoch}: {epoch_last_block}')
 
-                output_file = path.join(data, f'accounts_{prev_epoch}.csv')
+                account_file = path.join(data, f'accounts_{prev_epoch}.csv')
                 # Check if output already exists, to not overwrite it
-                if path.exists(output_file):
-                    if os.stat(output_file).st_size > 0:
-                        v_print(f'[main] Account snapshot file already exists & is not empty: {output_file}')
+                if path.exists(account_file):
+                    if os.stat(account_file).st_size > 0:
+                        v_print(f'[main] Account snapshot file already exists & is not empty: {account_file}')
                     else:
-                        v_print(f'[main] Account snapshot file already exists & is empty: {output_file}')
-                        create_account_snapshot(network_accounts, epoch_last_block, prev_epoch, args.endpoint, output_file, args.retries)
+                        v_print(f'[main] Account snapshot file already exists & is empty: {account_file}')
+                        create_account_snapshot(network_accounts, epoch_last_block, prev_epoch, args.endpoint, account_file, args.retries)
                 else:
-                    create_account_snapshot(network_accounts, epoch_last_block, prev_epoch, args.endpoint, output_file, args.retries)
-                get_validator_snapshot(epoch_last_block, args.endpoint, args.retries)
+                    create_account_snapshot(network_accounts, epoch_last_block, prev_epoch, args.endpoint, account_file, args.retries)
+
+                validator_file = path.join(data, f'validators_{prev_epoch}.csv')
+                if path.exists(validator_file):
+                    if os.stat(validator_file).st_size > 0:
+                        v_print(f'[main] Validator snapshot file already exists & is not empty: {validator_file}')
+                    else:
+                        v_print(f'[main] Validator snapshot file already exists & is empty: {validator_file}')
+                        create_validator_snapshot(epoch_last_block, args.endpoint, validator_file, args.retries)
+                else:
+                    create_validator_snapshot(epoch_last_block, args.endpoint, validator_file, args.retries)
 
                 prev_epoch = current_epoch
 
