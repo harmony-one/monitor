@@ -46,8 +46,7 @@ def get_simple_rotating_log_handler(log_file_path):
     Used purely for the output rotation.
     """
     log_formatter = logging.Formatter('%(message)s')
-    handler = logging.handlers.TimedRotatingFileHandler(log_file_path, when = 'h', interval = 2,
-                                                        backupCount = None, encoding = 'utf8')
+    handler = logging.handlers.TimedRotatingFileHandler(log_file_path, when = 'h', interval = 4, encoding = 'utf8')
     handler.setLevel(logging.DEBUG)
     handler.setFormatter(log_formatter)
     handler.rotator = _GZipRotator()
@@ -306,9 +305,6 @@ def get_validator_snapshot(block_num, endpoint, retries):
         err = {'error': f'unable to fetch list of all validators after for block #{block_num} after {retries} tries'}
         logger.debug(json.dumps(err, sort_keys = True, indent = 4))
 
-    # TODO: Log getSuperCommittes?
-
-# TODO: Check math
 def get_epoch_last_block(epoch, blocks_per_epoch):
     return ((epoch + 1) * blocks_per_epoch) - 1
 
