@@ -197,14 +197,17 @@ def get_blockchain(start_block, end_block, endpoint, retries):
                 for stx in staking_transactions:
                     active_accounts.add(stx['from'])
 
-                logger.debug(json.dumps(block, sort_keys = True, indent = 4))
+                # logger.debug(json.dumps(block, sort_keys = True, indent = 4))
+                logger.debug(json.dumps(block, sort_keys = True))
             except Exception as e:
                 err = {'error': f'error parsing output for block #{num}',
                        'reply': block}
-                logger.debug(json.dumps(err, sort_keys = True, indent = 4))
+                # logger.debug(json.dumps(err, sort_keys = True, indent = 4))
+                logger.debug(json.dumps(err, sort_keys = True))
         else:
             err = {'error': f'unable to fetch block #{num} after {retries} tries'}
-            logger.debug(json.dumps(err, sort_keys = True, indent = 4))
+            # logger.debug(json.dumps(err, sort_keys = True, indent = 4))
+            logger.debug(json.dumps(err, sort_keys = True))
 
     return active_accounts
 
@@ -237,20 +240,30 @@ def create_account_snapshot(account_list, block_num, epoch, endpoint, output_fil
                 account_data[addr]['total-delegations'] = total_delegation
                 account_data[addr]['total-undelegations'] = total_undelegations
                 account_data[addr]['total-rewards'] = total_rewards
-                logger.debug(json.dumps(delegation, sort_keys = True, indent = 4))
+
+                delegation['blockNum'] = block_num
+                delegation['delegatorAddr'] = addr
+                # logger.debug(json.dumps(delegation, sort_keys = True, indent = 4))
+                logger.debug(json.dumps(delegation, sort_keys = True))
             except Exception as e:
                 account_data[addr]['total-delegations'] = 'NAN'
                 account_data[addr]['total-undelegations'] = 'NAN'
                 account_data[addr]['total-rewards'] = 'NAN'
+
                 err = {'error': f'error parsing delegation output for {addr}',
-                       'reply': delegation}
-                logger.debug(json.dumps(err, sort_keys = True, indent = 4))
+                       'reply': delegation,
+                       'block': block_num,
+                       }
+                # logger.debug(json.dumps(err, sort_keys = True, indent = 4))
+                logger.debug(json.dumps(err, sort_keys = True))
         else:
             account_data[addr]['total-delegations'] = 'NAN'
             account_data[addr]['total-undelegations'] = 'NAN'
             account_data[addr]['total-rewards'] = 'NAN'
-            err = {'error': f'unable to fetch delegations for {addr} after {retries} tries'}
-            logger.debug(json.dumps(err, sort_keys = True, indent = 4))
+
+            err = {'error': f'unable to fetch delegations for {addr} after {retries} tries for block #{block_num}'}
+            # logger.debug(json.dumps(err, sort_keys = True, indent = 4))
+            logger.debug(json.dumps(err, sort_keys = True))
 
     balance_pool = ThreadPool()
     balance_threads = []
@@ -263,19 +276,29 @@ def create_account_snapshot(account_list, block_num, epoch, endpoint, output_fil
             try:
                 account_data[addr]['balance'] = convert_atto_to_one(int(balance, 0))
                 account_data[addr]['total-balance'] = sum([x for x in account_data[addr].values() if isinstance(x, Decimal)])
-                formatted_balance = {'address': addr, 'balance': balance}
-                logger.debug(json.dumps(formatted_balance, sort_keys = True, indent = 4))
+                formatted_balance = {'address': addr,
+                                     'balance': balance,
+                                     'block': block_num,
+                                     }
+                # logger.debug(json.dumps(formatted_balance, sort_keys = True, indent = 4))
+                logger.debug(json.dumps(formatted_balance, sort_keys = True))
             except Exception:
                 account_data[addr]['balance'] = 'NAN'
                 account_data[addr]['total-balance'] = sum([x for x in account_data[addr].values() if isinstance(x, Decimal)])
+
                 err = {'error': f'error parsing balance output for {addr}',
-                       'reply': balance}
-                logger.debug(json.dumps(err, sort_keys = True, indent = 4))
+                       'reply': balance,
+                       'block': block_num,
+                       }
+                # logger.debug(json.dumps(err, sort_keys = True, indent = 4))
+                logger.debug(json.dumps(err, sort_keys = True))
         else:
             account_data[addr]['balance'] = 'NAN'
             account_data[addr]['total-balance'] = sum([x for x in account_data[addr].values() if isinstance(x, Decimal)])
-            err = {'error': f'unable to fetch balance for {addr} after {retries} tries'}
-            logger.debug(json.dumps(err, sort_keys = True, indent = 4))
+
+            err = {'error': f'unable to fetch balance for {addr} after {retries} tries for block #{block_num}'}
+            # logger.debug(json.dumps(err, sort_keys = True, indent = 4))
+            logger.debug(json.dumps(err, sort_keys = True))
 
     with open(output_file, 'w', encoding = 'utf8') as f:
         field_names = ['Address', 'Balance', 'Delegations', 'Undelegations', 'Rewards', 'Total']
@@ -308,14 +331,17 @@ def create_validator_snapshot(block_num, endpoint, validator_earning, output_fil
                         for k in info['metrics']['by-bls-key']:
                             validator_earning[addr][k['key']['bls-public-key']] = convert_atto_to_one(k['earned-reward'])
                     # Add block number to output in case need to parse later
-                    info['blockNumber'] = block_num
-                    logger.debug(json.dumps(info, sort_keys = True, indent = 4))
+                    info['blockNum'] = block_num
+                    # logger.debug(json.dumps(info, sort_keys = True, indent = 4))
+                    logger.debug(json.dumps(info, sort_keys = True))
                 except Exception:
                     err = {'error': f'error parsing validator information for {addr} for block #{block_num}'}
-                    logger.debug(json.dumps(err, sort_keys = True, indent = 4))
+                    # logger.debug(json.dumps(err, sort_keys = True, indent = 4))
+                    logger.debug(json.dumps(err, sort_keys = True))
     else:
         err = {'error': f'unable to fetch list of all validators after for block #{block_num} after {retries} tries'}
-        logger.debug(json.dumps(err, sort_keys = True, indent = 4))
+        # logger.debug(json.dumps(err, sort_keys = True, indent = 4))
+        logger.debug(json.dumps(err, sort_keys = True))
 
     with open(output_file, 'w', encoding = 'utf8') as f:
         field_names = ['Address', 'BLSKey', 'Lifetime Rewards']
@@ -472,7 +498,7 @@ if __name__ == '__main__':
             # Do snapshot on epoch change
             if current_epoch > prev_epoch:
                 # Do snapshots for all epochs between (okay to duplicate in loop range)
-                # NOTE: Current loop doesn't work correctly for delegations 
+                # NOTE: Current loop doesn't work correctly for delegations
                 for x in range(prev_epoch, current_epoch):
                     epoch_last_block = get_epoch_last_block(x, blocks_per_epoch)
 
