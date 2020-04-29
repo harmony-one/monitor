@@ -454,7 +454,7 @@ if __name__ == '__main__':
         validator_files = get_validator_snapshot_files()
         if len(validator_files) > 0:
             latest_validator_file = max(account_files, key = path.getctime)
-            v_print(f'[init] Reading initial data from: {latest_account_file}')
+            v_print(f'[init] Reading initial data from: {latest_validator_file}')
             with open(latest_validator_file, 'r', encoding = 'utf8') as f:
                 reader = csv.reader(f)
                 # Skip header line
@@ -470,7 +470,10 @@ if __name__ == '__main__':
     while True:
         v_print(f'-- Loop {datetime.now()}--')
         # Don't retry latest block, just skip iteration
-        latest_block = get_latest_header(args.endpoint)
+        try:
+            latest_block = get_latest_header(args.endpoint)
+        except:
+            latest_block = None
         if latest_block is not None:
             try:
                 current_block = latest_block['blockNumber']
