@@ -11,6 +11,7 @@ import re
 import requests
 
 from collections import defaultdict
+from datetime import datetime
 from decimal import Decimal
 from glob import glob
 from os import path
@@ -396,7 +397,7 @@ if __name__ == '__main__':
     init_loggers()
 
     while True:
-        v_print('-- Loop --')
+        v_print(f'-- Loop {datetime.now()}--')
         # Don't retry latest block, just skip iteration
         latest_block = get_latest_header(args.endpoint)
         if latest_block is not None:
