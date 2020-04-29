@@ -235,8 +235,8 @@ def create_account_snapshot(account_list, block_num, epoch, endpoint, output_fil
                     total_rewards = total_rewards + convert_atto_to_one(d['reward'])
                     # TODO: Double check undelegations format
                     for u in d['Undelegations']:
-                        if epoch - u['epoch'] <= 7:
-                            total_undelegations = total_undelegations + convert_atto_to_one(u['amount'])
+                        if epoch - u['Epoch'] <= 7:
+                            total_undelegations = total_undelegations + convert_atto_to_one(u['Amount'])
                 account_data[addr]['total-delegations'] = total_delegation
                 account_data[addr]['total-undelegations'] = total_undelegations
                 account_data[addr]['total-rewards'] = total_rewards
