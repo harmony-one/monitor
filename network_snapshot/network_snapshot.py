@@ -241,8 +241,10 @@ def create_account_snapshot(account_list, block_num, epoch, endpoint, output_fil
                 account_data[addr]['total-undelegations'] = total_undelegations
                 account_data[addr]['total-rewards'] = total_rewards
 
-                delegation['blockNum'] = block_num
-                delegation['delegatorAddr'] = addr
+                delegation_wrapper = {}
+                delegation_wrapper['blockNum'] = block_num
+                delegation_wrapper['delegatorAddr'] = addr
+                delegation_wrapper['delegation'] = delegation
                 # logger.debug(json.dumps(delegation, sort_keys = True, indent = 4))
                 logger.debug(json.dumps(delegation, sort_keys = True))
             except Exception as e:
