@@ -344,7 +344,7 @@ def zip_old_files(file_list, epoch):
     v_print(f'[zip_old_files] Zipping old files: {file_list}')
     for s in file_list:
         try:
-            epoch_token = path.basename(latest_account_file).split('.')[0].split('_')[1]
+            epoch_token = path.basename(s).split('.')[0].split('_')[1]
             if int(epoch_token) < epoch:
                 with open(s, 'rb') as src:
                     zip_file = path.join(data, f'{path.basename(s)}.gz')
@@ -472,6 +472,7 @@ if __name__ == '__main__':
             # Do snapshot on epoch change
             if current_epoch > prev_epoch:
                 # Do snapshots for all epochs between (okay to duplicate in loop range)
+                # NOTE: Current loop doesn't work correctly for delegations 
                 for x in range(prev_epoch, current_epoch):
                     epoch_last_block = get_epoch_last_block(x, blocks_per_epoch)
 
