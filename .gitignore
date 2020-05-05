@@ -11,3 +11,6 @@ mini_explorer/data
 # Status page specific ignores
 status_page/watchdog_authentication.txt
 
+# Delegator leaderboard specific ignores
+delegator_leaderboard/csv
+delegator_leaderboard/data
