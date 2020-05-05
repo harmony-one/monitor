@@ -104,10 +104,10 @@ if __name__ == "__main__":
         except:
             print("Could not make data directory")
             exit(1)
-    csv = path.abspath(path.join(base, 'csv'))
-    if not path.exists(csv):
+    csvd = path.abspath(path.join(base, 'csv'))
+    if not path.exists(csvd):
         try:
-            os.mkdir(csv)
+            os.mkdir(csvd)
         except:
             print("Could not make csv directory")
             exit(1)
@@ -181,14 +181,14 @@ if __name__ == "__main__":
     delegator = read_csv(html)
     df['filter'] = df.apply(lambda c: True if c['address'] in delegator else False, axis = 1)
     print("-- Save csv files to ./csv/{:s}_delegator.csv --".format(time))
-    df.to_csv(path.join(csv, '{:s}_delegator.csv'.format(time)))
+    df.to_csv(path.join(csvd, '{:s}_delegator.csv'.format(time)))
 
     filter_df = df[df['filter']].reset_index(drop = True)
-    filter_df.to_csv(path.join(csv, '{:s}_filter_delegator.csv'.format(time)))
+    filter_df.to_csv(path.join(csvd, '{:s}_filter_delegator.csv'.format(time)))
     print("-- Save csv files to ./csv/{:s}_filter_delegator.csv --".format(time))
 
     env = Environment(loader = FileSystemLoader(path.join(base, 'app', 'templates')), auto_reload = False)
     template = env.get_template('delegator.html.j2')
-    with open(path.join(data, 'delegator.html'), 'w', encoding = 'utf-8') as f:
+    with open(path.join(data, 'delegator_rewards.html'), 'w', encoding = 'utf-8') as f:
         f.write(template.render(delegators = df))
     print(f'-- Output HTML --')
