@@ -189,6 +189,7 @@ if __name__ == "__main__":
 
     env = Environment(loader = FileSystemLoader(path.join(base, 'app', 'templates')), auto_reload = False)
     template = env.get_template('delegator.html.j2')
+    df = df.sort_values(by = ['lifetime-reward (total rewards - claim rewards)', 'stake (total delegated stake)'])
     with open(path.join(data, 'delegator_rewards.html'), 'w', encoding = 'utf-8') as f:
         f.write(template.render(delegators = df))
     print(f'-- Output HTML --')

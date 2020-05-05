@@ -7,7 +7,7 @@
   />
   <head>
     <meta charset="utf-8">
-    <title>Validator Statistics | Harmony</title>
+    <title>Delegator Statistics | Harmony</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
     <link href="/static/apple-touch-icon-76x76.png" rel="apple-touch-icon" sizes="76x76">
     <link href="/static/apple-touch-icon-120x120.png" rel="apple-touch-icon" sizes="120x120">
@@ -70,8 +70,8 @@
                       <td style="font-family:'Courier New', monospaced; font-weight: 550;">
                         {{ d['address'] }}
                       </td>
-                      <td align="right">{{ d['stake (total delegated stake)'] }}</td>
-                      <td align="right">{{ d['lifetime-reward (total rewards - claim rewards)'] }}</td>
+                      <td align="right">{{ '%.4f'|format(d['stake (total delegated stake)']) }}</td>
+                      <td align="right">{{ '%.4f'|format(d['lifetime-reward (total rewards - claim rewards)']) }}</td>
                     </tr>
                     {% endfor %}
                   </table>
