@@ -11,3 +11,5 @@ mini_explorer/data
 # Status page specific ignores
 status_page/watchdog_authentication.txt
 
+# Validator earning specific ignores
+validator_earning/data
