@@ -11,6 +11,10 @@ mini_explorer/data
 # Status page specific ignores
 status_page/watchdog_authentication.txt
 
+
+# Validator earning specific ignores
+validator_earning/data
+
 # Delegator leaderboard specific ignores
 delegator_leaderboard/csv
 delegator_leaderboard/data

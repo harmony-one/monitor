@@ -13,7 +13,6 @@ from time import sleep
 from statistics import median
 from threading import Thread
 
-from AutoNode import common
 from jinja2 import (
     Environment,
     FileSystemLoader
@@ -27,9 +26,6 @@ raw_data = path.join(data, 'validator_info.json')
 net_stat = path.join(data, 'network_stats.json')
 
 rpc_headers = {'Content-Type': 'application/json'}
-
-security_contact = common._validator_config_default['security-contact']
-identity = common._validator_config_default['identity']
 
 def rpc_request(method, endpoint, params):
     v_print(f'-- RPC Request: {method}, {params}')
@@ -122,15 +118,14 @@ if __name__ == '__main__':
                 if val['earned-rewards'] is not None:
                     val['earning'] = val['current-earnings'] > float(0)
                 val['lifetime-rewards'] = float(current_earnings)
-                if info['validator']['security-contact'] == 'info@ankr.com':
-                    val['tag'] = 'ankr'
-                elif info['validator']['security-contact'] == security_contact or info['validator']['identity'] == identity:
-                    val['tag'] = 'Autonode'
-                else:
-                    val['tag'] = ''
-                if val['elected']:
+                try:
                     avail = int(float(info['current-epoch-performance']['current-epoch-signing-percent']['current-epoch-signing-percentage']) * 100)
                     val['availibility'] = avail
+                except:
+                    # In case RPC breaks
+                    val['availibility'] = 'NAN'
+                    pass
+                if val['elected']:
                     elected.append(val)
                 else:
                     not_elected.append(val)
