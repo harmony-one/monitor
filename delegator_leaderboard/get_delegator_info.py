@@ -2,15 +2,21 @@
 # coding: utf-8
 
 import json
-import pandas as pd
 import os
-from os import path
 import requests
 import csv
 import re
-from collections import defaultdict
 import datetime
+import pandas as pd
+
+from os import path
+from collections import defaultdict
 from threading import Thread
+
+from jinja2 import (
+    Environment,
+    FileSystemLoader
+)
 
 def get_information(url, method, params) -> dict:
     headers = {'Content-Type': 'application/json'}
@@ -51,7 +57,7 @@ def getTransactionCount(shard, address):
     res = get_information(url, method, params)
     if res != None:
         return int(res,16)
-    
+
 def getTransactionsCount(shard, address) -> int:
     url = endpoint[shard]
     method = 'hmy_getTransactionsCount'
@@ -85,20 +91,27 @@ def read_csv(csv_file) -> (list):
     return v
 
 
-if __name__ == "__main__":  
-    
+if __name__ == "__main__":
+
 #     endpoint = ['https://api.s0.os.hmny.io/', 'https://api.s1.os.hmny.io/', 'https://api.s2.os.hmny.io/', 'https://api.s3.os.hmny.io/']
     endpoint = ['http://54.215.128.188:9500', 'http://3.133.150.51:9500', 'http://3.91.3.73:9500','http://54.149.112.16:9500']
-    
+
     base = path.dirname(path.realpath(__file__))
-    data = path.abspath(path.join(base, 'csv'))
+    data = path.abspath(path.join(base, 'data'))
     if not path.exists(data):
         try:
             os.mkdir(data)
         except:
+            print("Could not make data directory")
+            exit(1)
+    csv = path.abspath(path.join(base, 'csv'))
+    if not path.exists(csv):
+        try:
+            os.mkdir(csv)
+        except:
             print("Could not make csv directory")
             exit(1)
-            
+
     print("-- Data Processing --")
     validator_infos = getAllValidatorInformation()
     del_reward = defaultdict(int)
@@ -115,7 +128,7 @@ if __name__ == "__main__":
             del_reward[del_address] += reward
             amount = d['amount']/1e18
             del_stake[del_address] += amount
-                
+
     del_address = set(del_reward.keys()) - set(val_address)
     balance = defaultdict(int)
     staking_transaction = defaultdict(int)
@@ -126,7 +139,7 @@ if __name__ == "__main__":
         thread_lst[i%100].append(i)
     def collect_data(shard, x):
         global staking_transaction, normal_transaction, balance
-        for i in thread_lst[x]: 
+        for i in thread_lst[x]:
             addr = address_lst[i]
             if shard == 0:
                 staking_transaction[addr] = getStakingTransactionCount(addr)
@@ -144,7 +157,7 @@ if __name__ == "__main__":
         t.start()
     for t in threads:
         t.join()
-        
+
     balance_df = pd.DataFrame(balance.items(), columns=['address', 'balance'])
     staking_transaction_df = pd.DataFrame(staking_transaction.items(), columns = ['address', 'staking-transaction-count'])
     normal_transaction_df = pd.DataFrame(normal_transaction.items(), columns = ['address', 'normal-transaction-count'])
@@ -161,15 +174,21 @@ if __name__ == "__main__":
     df = df.join(balance_df.set_index('address'), on = 'address')
     df = df.join(staking_transaction_df.set_index('address'), on = 'address')
     df = df.join(normal_transaction_df.set_index('address'), on = 'address')
-    time = datetime.datetime.now().strftime("%Y_%m_%d %H:%M:%S") 
-    
+    time = datetime.datetime.now().strftime("%Y_%m_%d %H:%M:%S")
+
     print("-- Filter the delegators in the google sheet --")
     html = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTDAqXO-xVP4UwJlNJ6Qaws4N-TZ3FNZXqiSidPzU1I8pX5DS063d8h0jw84QhPmMDVBgKhopHhilFy/pub?gid=0&single=true&output=csv'
     delegator = read_csv(html)
     df['filter'] = df.apply(lambda c: True if c['address'] in delegator else False, axis = 1)
     print("-- Save csv files to ./csv/{:s}_delegator.csv --".format(time))
-    df.to_csv(path.join(data, '{:s}_delegator.csv'.format(time)))
-    
+    df.to_csv(path.join(csv, '{:s}_delegator.csv'.format(time)))
+
     filter_df = df[df['filter']].reset_index(drop = True)
-    filter_df.to_csv(path.join(data, '{:s}_filter_delegator.csv'.format(time)))
+    filter_df.to_csv(path.join(csv, '{:s}_filter_delegator.csv'.format(time)))
     print("-- Save csv files to ./csv/{:s}_filter_delegator.csv --".format(time))
+
+    env = Environment(loader = FileSystemLoader(path.join(base, 'app', 'templates')), auto_reload = False)
+    template = env.get_template('delegator.html.j2')
+    with open(path.join(data, 'delegator.html'), 'w', encoding = 'utf-8') as f:
+        f.write(template.render(delegators = df))
+    print(f'-- Output HTML --')
