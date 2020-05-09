@@ -70,8 +70,8 @@
                       <td style="font-family:'Courier New', monospaced; font-weight: 550;">
                         {{ d['address'] }}
                       </td>
-                      <td align="right">{{ '%.4f'|format(d['total-stake']) }}</td>
-                      <td align="right">{{ '%.4f'|format(d['total-lifetime-reward']) }}</td>
+                      <td align="right">{{ '%.4f'|format(d['stake (total delegated stake)']) }}</td>
+                      <td align="right">{{ '%.4f'|format(d['lifetime-reward (total rewards - claim rewards)']) }}</td>
                     </tr>
                     {% endfor %}
                   </table>
