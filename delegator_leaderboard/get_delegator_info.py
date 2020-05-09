@@ -19,22 +19,23 @@ from jinja2 import (
 )
 
 def get_information(url, method, params) -> dict:
-    headers = {'Content-Type': 'application/json'}
+    headers = {'Content-Type': 'application/json; charset=utf8'}
     data = {"jsonrpc":"2.0", "method": method, "params": params, "id":1}
-    r = requests.post(url, headers=headers, data = json.dumps(data))
+    try:
+        r = requests.post(url, headers=headers, data = json.dumps(data))
+    except requests.exceptions.ConnectionError as e:
+        print("Error: connection error")
+        time.sleep(5)
+        return None
     if r.status_code != 200:
         print("Error: Return status code %s" % r.status_code)
         return None
     try:
-        content = json.loads(r.content)
+        r.json()
     except ValueError:
         print("Error: Unable to read JSON reply")
         return None
-    if "error" in content:
-        print("Error: The method does not exist/is not available")
-        return None
-    else:
-        return content['result']
+    return r.json()
 
 def getAllValidatorInformation():
     url = 'https://api.s0.os.hmny.io/'
@@ -42,21 +43,18 @@ def getAllValidatorInformation():
     params = [-1]
     return get_information(url, method, params)
 
-def getBalance(shard, address):
+def getBalance(shard, address) -> int:
     url = endpoint[shard]
-    method = "hmy_getBalance"
-    params = [address, "latest"]
-    res = get_information(url, method, params)
-    if res != None:
-        return int(res,16)/1e18
+    method = 'hmyv2_getBalance'
+    params = [address]
+    return get_information(url, method, params)
 
 def getTransactionCount(shard, address):
     url = endpoint[shard]
     method = "hmy_getTransactionCount"
     params = [address, 'latest']
-    res = get_information(url, method, params)
-    if res != None:
-        return int(res,16)
+    return get_information(url, method, params)
+
 
 def getTransactionsCount(shard, address) -> int:
     url = endpoint[shard]
@@ -77,9 +75,8 @@ def getTransactionHistory(shard, address):
         "txType": "ALL",
         "order": "ASC"
     }]
-    res = get_information(url, method, params)
-    if res != None:
-        return res['transactions']
+    return get_information(url, method, params)
+
 
 def getStakingTransactionCount(address):
     url = 'https://api.s0.os.hmny.io/'
@@ -91,14 +88,14 @@ def getEpoch():
     url = 'https://api.s0.os.hmny.io/'
     method = "hmy_getEpoch"
     params = []
-    epoch = get_information(url, method, params)
+    epoch = get_information(url, method, params)['result']
     return int(epoch, 16)
 
 def getBlockNumber():
     url = 'https://api.s0.os.hmny.io/'
     method = "hmy_blockNumber"
     params = []
-    num = get_information(url, method, params)
+    num = get_information(url, method, params)['result']
     return int(num, 16)
 
 def read_csv(csv_file) -> (list):
@@ -135,7 +132,7 @@ if __name__ == "__main__":
             exit(1)
 
     print("-- Data Processing --")
-    validator_infos = getAllValidatorInformation()
+    validator_infos = getAllValidatorInformation()['result']
     epoch = getEpoch()
     block = getBlockNumber()
     print(f"Current Epoch number: {epoch}, Block number: {block}")
@@ -163,6 +160,7 @@ if __name__ == "__main__":
     staking_transaction = defaultdict(int)
     normal_transaction = defaultdict(int)
     address_lst = list(del_address)
+    address_lst.remove("one1zksj3evekayy90xt4psrz8h6j2v3hla4qwz4ur")
     thread_lst = defaultdict(list)
     for i in range(len(address_lst)):
         thread_lst[i%25].append(i)
@@ -171,16 +169,18 @@ if __name__ == "__main__":
         for i in thread_lst[x]:
             addr = address_lst[i]
             if shard == 0:
-                staking_transaction[addr] = getStakingTransactionCount(addr)
+                stake_count = getStakingTransactionCount(addr)
+                if stake_count != None:
+                    staking_transaction[addr] = stake_count
             res = getBalance(shard, addr)
             if res != None:
-                balance[addr] += res
+                balance[addr] += res['result']
                 count = getTransactionCount(shard, addr)
                 if count != None:
-                    normal_transaction[addr] += count
+                    normal_transaction[addr] += int(count['result'],16)
             txs = getTransactionHistory(shard, addr)
             if txs != None:
-                for i in txs:
+                for i in txs['result']['transactions']:
                     ## self transfer
                     if i['to'] == addr:
                         txs_sum[addr] += i['value']/1e18
@@ -209,7 +209,7 @@ if __name__ == "__main__":
     new_del_stake = dict()
     new_undel = dict()
     for k,v in del_reward.items():
-        if k in del_address:
+        if k in address_lst:
             new_del_reward[k] = v
             new_del_stake[k] = del_stake[k]
             new_undel[k] = undel[k]
