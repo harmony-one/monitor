@@ -95,7 +95,6 @@
                       <th align="right">Total Stake</th>
                       <th align="right">BLS Keys</th>
                       <th align="right">Lifetime Rewards</th>
-                      <th>Tag</th>
                     </tr>
                     {% for v in not_elected %}
                     <tr>
@@ -106,7 +105,6 @@
                       <td align="right">{{ '%.4f'|format(v['stake']) }}</td>
                       <td align="right">{{ v['num-keys'] }}</td>
                       <td align="right">{{ '%.4f'|format(v['lifetime-rewards']) }}</td>
-                      <td>{{ v['tag'] }}</td>
                     </tr>
                     {% endfor %}
                   </table>
