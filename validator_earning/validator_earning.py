@@ -47,7 +47,7 @@ def atto_to_one(atto):
     return Decimal(atto) / Decimal(1e18)
 
 if __name__ == '__main__':
-    valid_networks = ['os', 'ps', 'stn']
+    valid_networks = ['t', 'os', 'ps', 'stn']
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--network_endpoint', choices = valid_networks, help = 'Tag for network endpoint')
