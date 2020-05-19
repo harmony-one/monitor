@@ -18,3 +18,8 @@ validator_earning/data
 # Delegator leaderboard specific ignores
 delegator_leaderboard/csv
 delegator_leaderboard/data
+
+# One holder specific ignores
+one_holder/csv
+one_holder/data
+one_holder/logs
