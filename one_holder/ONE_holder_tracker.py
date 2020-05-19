@@ -97,8 +97,9 @@ if __name__ == "__main__":
     base = path.dirname(path.realpath(__file__))
     log_dir = path.abspath(path.join(base, 'logs'))
     data = path.abspath(path.join(base, 'data'))
+    json_dir = path.abspath(path.join(base, 'json'))
     
-    folder = [log_dir, data]
+    folder = [log_dir, data, json_dir]
     for f in folder:
         if not path.exists(f):
             try:
@@ -160,6 +161,8 @@ if __name__ == "__main__":
 #     df.to_csv(path.join(csv_dir, csv_name))
 #     html_name = "{}_{}_tracker.html".format(network, datetime.now().strftime("%Y_%m_%d %H:%M:%S"))
 #     df.to_html(path.join(html_dir, html_name))
+    json_name = "data.json"
+    df.to_json(path.join(json_dir, json_name))
 
     env = Environment(loader = FileSystemLoader(path.join(base, 'app', 'templates')), auto_reload = False)
     template = env.get_template('one_holder.html.j2')
