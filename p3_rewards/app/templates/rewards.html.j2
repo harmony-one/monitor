@@ -7,7 +7,7 @@
   />
   <head>
     <meta charset="utf-8">
-    <title>Foundational Node Earnings | Harmony</title>
+    <title>P3 Campaign Leaderboard | Harmony</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
     <link href="/static/apple-touch-icon-76x76.png" rel="apple-touch-icon" sizes="76x76">
     <link href="/static/apple-touch-icon-120x120.png" rel="apple-touch-icon" sizes="120x120">
@@ -51,21 +51,39 @@
         <div class="container">
           <div class="explorer-card">
             <header>
-              <h1>Foundational Node Earnings</h1>
+              <h1>P3 Campaign Rewards</h1>
             </header>
             <div style="padding-top: 4px; padding-left: 20px">
-              <p><font size="2">Starting from 6/28/2019 to 5/16/2020</font></p>
+              <p><font size="2">If you have any issues, please report them <a href='https://forms.gle/i6S74AEpgUA1HXBb8'>here</a>!</font></p>
             </div>
             <div class="card flex-col">
             <span style="width: 95%;margin-right: 0;">
               <details open>
+                <summary>Validators</summary>
                 <div class="flex-col">
                   <table style = "width: 95%;">
                     <tr>
                       <th>Address</th>
-                      <th>Earning</th>
+                      <th>Reward</th>
                     </tr>
-                    {% for address, amount in data.items() %}
+                    {% for address, amount in validators.items() %}
+                    <tr>
+                      <td>{{ address }}</td>
+                      <td>{{ amount }}</td>
+                    </tr>
+                    {% endfor %}
+                  </table>
+                </div>
+              </details>
+              <details open>
+                <summary>Delegators</summary>
+                <div class="flex-col">
+                  <table style = "width: 95%;">
+                    <tr>
+                      <th>Address</th>
+                      <th>Reward</th>
+                    </tr>
+                    {% for address, amount in delegators.items() %}
                     <tr>
                       <td>{{ address }}</td>
                       <td>{{ amount }}</td>
