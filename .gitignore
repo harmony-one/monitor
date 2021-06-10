@@ -18,3 +18,5 @@ validator_earning/data
 # Delegator leaderboard specific ignores
 delegator_leaderboard/csv
 delegator_leaderboard/data
+.idea
+/status_page/venv

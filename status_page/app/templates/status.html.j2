@@ -89,6 +89,7 @@
                       <th>Status</th>
                       <th>Block</th>
                       <th>Epoch</th>
+                      <th>Blocks To Next Epoch</th>
                       <th>Timestamp (UTC)</th>
                       <th>Leader</th>
                       <th>Endpoint</th>
@@ -103,6 +104,11 @@
                       {% endif %}
                       <td>{{ data[net]['block'][value]['current-block-number'] }}</td>
                       <td>{{ data[net]['block'][value]['current-epoch'] }}</td>
+                      {% if data[net]['block'][value]['shard-id'] == '0' %}
+                      <td>{{ data[net]['block'][value]['next-epoch-first-block'] - data[net]['block'][value]['current-block-number'] }}</td>
+                      {% else %}
+                      <td>-</td>
+                      {% endif %}
                       <td>{{ data[net]['block'][value]['block-timestamp'][:-10] }}</td>
                       <td style="font-family:'Courier New', monospaced; font-weight: 550;">
                         {{ data[net]['block'][value]['leader-address'] }}
